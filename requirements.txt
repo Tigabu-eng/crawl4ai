@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+httpx
+playwright
+requests
+
+# Add this to run postinstall script on deployment
+# This is a workaround since requirements.txt does not support postinstall natively
+# You may need to configure this in Railway or Vercel build settings
