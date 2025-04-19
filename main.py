@@ -474,6 +474,21 @@ async def scrape_bc_endpoint(name: str = Query(..., description="Search name (Ca
             "error": "Failed to scrape British Columbia data",
             "details": str(e)
         })
+    
+
+@app.get("/")
+async def root():
+    return {
+        "message": "Welcome to crawl4ai API. Use /scrape, /scrape-all, or a province-specific route to get started.",
+        "endpoints": [
+            "/scrape?name=",
+            "/scrape-all?name=&province=",
+            "/scrape-quebec?name=",
+            "/scrape-alberta?name=",
+            "/scrape-bc?name="
+        ]
+    }
+
 
 @app.get("/scrape-all")
 async def scrape_all(name: str, province: str = Query("ontario", enum=["ontario", "quebec", "alberta", "bc"])):
@@ -487,6 +502,7 @@ async def scrape_all(name: str, province: str = Query("ontario", enum=["ontario"
         else:
             data = await scrape_openroom(name)
         return {"results": data or []}
+        
     except Exception as e:
         print(f"[ERROR /scrape-all for province={province}] {e}")
         return JSONResponse(status_code=500, content={
