@@ -476,7 +476,7 @@ async def scrape_bc_endpoint(name: str = Query(..., description="Search name (Ca
         })
     
 
-@app.get("/")
+@app.get("/")               
 async def root():
     return {
         "message": "Welcome to crawl4ai API. Use /scrape, /scrape-all, or a province-specific route to get started.",
