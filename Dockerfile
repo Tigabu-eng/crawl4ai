@@ -9,7 +9,7 @@ ENV PYTHONUNBUFFERED=1 \
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies required by Playwright
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     wget curl unzip gnupg ca-certificates fonts-liberation libnss3 \
     libatk-bridge2.0-0 libx11-xcb1 libxcomposite1 libxdamage1 \
@@ -21,14 +21,14 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Install Playwright and browser binaries
+# Install Playwright and download its browser binaries
 RUN pip install playwright && playwright install --with-deps
 
-# Copy the application code
+# Copy source code
 COPY . .
 
-# Expose the port your app runs on
+# Expose the port (optional)
 EXPOSE 8000
 
-# Start the app using uvicorn
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000"]
+# Fix: Use shell to allow $PORT env var
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port $PORT"]
