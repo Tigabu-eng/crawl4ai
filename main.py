@@ -205,7 +205,8 @@ async def scrape_quebec(name: str):
                 "date": summary["date"],
                 "keywords": summary["keywords"],
                 "caseUrl": summary["caseUrl"],
-                "fullTextSnippet": full_text
+                "fullTextSnippet": trim_text_snippet(full_text)
+
             })
         await browser.close()
     return results
@@ -294,7 +295,7 @@ async def scrape_alberta(name: str):
                     "date": summary["date"],
                     "keywords": summary["keywords"],
                     "caseUrl": summary["caseUrl"],
-                    "fullTextSnippet": full_text
+                    "fullTextSnippet": trim_text_snippet(full_text)
                 })
 
             # Pagination
@@ -404,7 +405,7 @@ async def scrape_british_columbia(name: str):
                     "date": summary["date"],
                     "keywords": summary["keywords"],
                     "caseUrl": summary["caseUrl"],
-                    "fullTextSnippet": full_text
+                    "fullTextSnippet": trim_text_snippet(full_text)
                 })
 
             # Pagination
@@ -423,6 +424,12 @@ async def scrape_british_columbia(name: str):
 
     return results
 
+
+
+def trim_text_snippet(text: str, max_length: int = 5000) -> str:
+    if text and len(text) > max_length:
+        return text[:max_length].rstrip() + "… [TRIMMED]"
+    return text
 
 # ----------------------------------------
 # FastAPI Endpoints
