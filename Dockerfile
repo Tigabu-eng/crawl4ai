@@ -11,24 +11,22 @@ WORKDIR /app
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    wget curl unzip gnupg ca-certificates fonts-liberation libnss3 \
-    libatk-bridge2.0-0 libx11-xcb1 libxcomposite1 libxdamage1 \
-    libxrandr2 libasound2 libxss1 libgtk-3-0 libgbm-dev libxshmfence-dev \
-    libx264-dev xvfb \
+    wget curl unzip gnupg libnss3 libatk-bridge2.0-0 libx11-xcb1 libxcomposite1 libxdamage1 \
+    libxrandr2 libasound2 libxss1 libgtk-3-0 libgbm-dev libxshmfence-dev libx264-dev xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Install Playwright and download its browser binaries
+# Install Playwright and its browser binaries
 RUN pip install playwright && playwright install --with-deps
 
 # Copy source code
 COPY . .
 
-# Expose the port (optional)
+# Expose port
 EXPOSE 8000
 
-# Fix: Use shell to allow $PORT env var
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port $PORT"]
+# Use shell form to allow environment variable substitution
+CMD uvicorn main:app --host 0.0.0.0 --port $PORT
