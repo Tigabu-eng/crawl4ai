@@ -25,8 +25,8 @@ RUN pip install playwright && playwright install --with-deps
 # Copy source code
 COPY . .
 
-# Expose the port
+# Expose port
 EXPOSE 8000
 
-# Use shell form so env variables like $PORT are resolved
+# Start the app using shell to expand $PORT
 CMD sh -c "uvicorn main:app --host 0.0.0.0 --port $PORT"
