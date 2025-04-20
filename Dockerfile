@@ -29,4 +29,4 @@ COPY . .
 EXPOSE 8000
 
 # Use shell form so env variables like $PORT are resolved
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port $PORT"]
+CMD sh -c "uvicorn main:app --host 0.0.0.0 --port $PORT"
