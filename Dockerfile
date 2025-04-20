@@ -19,14 +19,14 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 RUN pip install --upgrade pip && pip install -r requirements.txt
 
-# Install Playwright and its browser binaries
+# Install Playwright and download its browser binaries
 RUN pip install playwright && playwright install --with-deps
 
 # Copy source code
 COPY . .
 
-# Expose port
+# Expose the port
 EXPOSE 8000
 
-# Use shell form to allow environment variable substitution
-CMD uvicorn main:app --host 0.0.0.0 --port $PORT
+# Use shell form so env variables like $PORT are resolved
+CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port $PORT"]
