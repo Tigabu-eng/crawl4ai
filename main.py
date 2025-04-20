@@ -426,7 +426,7 @@ async def scrape_british_columbia(name: str):
 
 
 
-def trim_text_snippet(text: str, max_length: int = 5000) -> str:
+def trim_text_snippet(text: str, max_length: int = 2500) -> str:
     if text and len(text) > max_length:
         return text[:max_length].rstrip() + "… [TRIMMED]"
     return text
