@@ -428,7 +428,7 @@ async def scrape_british_columbia(name: str):
 
 import re
 
-def clean_text_preserve_meaning(text: str, max_length: int = 5000) -> str:
+def clean_and_extract_decision(text: str, max_length: int = 5000) -> str:
     if not text:
         return ""
     # Remove newlines and tabs, compress multiple spaces
@@ -436,6 +436,33 @@ def clean_text_preserve_meaning(text: str, max_length: int = 5000) -> str:
     text = re.sub(r'\s{2,}', ' ', text)
     return text.strip()[:max_length]
 
+def clean_text_preserve_meaning(text: str, max_length: int = 2000) -> str:
+    if not text:
+        return ""
+
+    # Normalize and clean basic whitespace and noise
+    text = re.sub(r'[\n\r\t]+', ' ', text)
+    text = re.sub(r'\s{2,}', ' ', text).strip()
+
+    # Try to find French decision block
+    fr_match = re.search(r"(POUR CES MOTIFS[\s\S]{0,2000}?)(?=(Présence|Date de l’audience|Me\b|$))", text, re.IGNORECASE)
+
+    # Try to find English decision block
+    en_match = re.search(r"(Conclusion[\s\S]{0,2000}?)(?=(Dated|Respectfully submitted|Signed|$))", text, re.IGNORECASE)
+
+    # Prefer French match if found
+    snippet = None
+    if fr_match:
+        snippet = fr_match.group(1)
+    elif en_match:
+        snippet = en_match.group(1)
+    else:
+        # Fallback: last 5 paragraphs (based on bracketed [xx] style)
+        paragraphs = re.findall(r'\[\d+\][^\[]+', text)
+        snippet = ' '.join(paragraphs[-5:]) if paragraphs else text[-max_length:]
+
+    return snippet.strip()[:max_length] + ("…" if len(snippet) > max_length else "")
+    
 
 # ----------------------------------------
 # FastAPI Endpoints
