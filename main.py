@@ -436,33 +436,35 @@ def clean_and_extract_decision(text: str, max_length: int = 5000) -> str:
     text = re.sub(r'\s{2,}', ' ', text)
     return text.strip()[:max_length]
 
-def clean_text_preserve_meaning(text: str, max_length: int = 2000) -> str:
+
+def clean_text_preserve_meaning(text: str, max_length: int = 3000) -> str:
     if not text:
         return ""
 
-    # Normalize and clean basic whitespace and noise
+    # Clean up the text first
     text = re.sub(r'[\n\r\t]+', ' ', text)
     text = re.sub(r'\s{2,}', ' ', text).strip()
 
-    # Try to find French decision block
-    fr_match = re.search(r"(POUR CES MOTIFS[\s\S]{0,2000}?)(?=(Présence|Date de l’audience|Me\b|$))", text, re.IGNORECASE)
+    # Try to extract from "POUR CES MOTIFS" (French) or "Conclusion" (English)
+    fr_match = re.search(r"(POUR CES MOTIFS.*?)(Présence|Me\b|Dated|$)", text, re.IGNORECASE)
+    en_match = re.search(r"(Conclusion.*?)(Dated|Signed|Respectfully submitted|$)", text, re.IGNORECASE)
 
-    # Try to find English decision block
-    en_match = re.search(r"(Conclusion[\s\S]{0,2000}?)(?=(Dated|Respectfully submitted|Signed|$))", text, re.IGNORECASE)
-
-    # Prefer French match if found
     snippet = None
+
     if fr_match:
-        snippet = fr_match.group(1)
+        # Also try to get a few paragraphs before "POUR CES MOTIFS"
+        start_idx = max(0, fr_match.start() - 1000)
+        snippet = text[start_idx:fr_match.end()]
     elif en_match:
-        snippet = en_match.group(1)
+        start_idx = max(0, en_match.start() - 1000)
+        snippet = text[start_idx:en_match.end()]
     else:
-        # Fallback: last 5 paragraphs (based on bracketed [xx] style)
+        # fallback: last few [xx] paragraphs
         paragraphs = re.findall(r'\[\d+\][^\[]+', text)
-        snippet = ' '.join(paragraphs[-5:]) if paragraphs else text[-max_length:]
+        snippet = ' '.join(paragraphs[-6:]) if paragraphs else text[-max_length:]
 
     return snippet.strip()[:max_length] + ("…" if len(snippet) > max_length else "")
-    
+
 
 # ----------------------------------------
 # FastAPI Endpoints
