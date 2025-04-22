@@ -205,7 +205,7 @@ async def scrape_quebec(name: str):
                 "date": summary["date"],
                 "keywords": summary["keywords"],
                 "caseUrl": summary["caseUrl"],
-                "fullTextSnippet": trim_text_snippet(full_text)
+                "fullTextSnippet": clean_text_preserve_meaning(full_text)
 
             })
         await browser.close()
@@ -295,7 +295,7 @@ async def scrape_alberta(name: str):
                     "date": summary["date"],
                     "keywords": summary["keywords"],
                     "caseUrl": summary["caseUrl"],
-                    "fullTextSnippet": trim_text_snippet(full_text)
+                    "fullTextSnippet": clean_text_preserve_meaning(full_text)
                 })
 
             # Pagination
@@ -405,7 +405,7 @@ async def scrape_british_columbia(name: str):
                     "date": summary["date"],
                     "keywords": summary["keywords"],
                     "caseUrl": summary["caseUrl"],
-                    "fullTextSnippet": trim_text_snippet(full_text)
+                    "fullTextSnippet": clean_text_preserve_meaning(full_text)
                 })
 
             # Pagination
@@ -426,10 +426,16 @@ async def scrape_british_columbia(name: str):
 
 
 
-def trim_text_snippet(text: str, max_length: int = 4500) -> str:
-    if text and len(text) > max_length:
-        return text[:max_length].rstrip() + "… [TRIMMED]"
-    return text
+import re
+
+def clean_text_preserve_meaning(text: str, max_length: int = 5000) -> str:
+    if not text:
+        return ""
+    # Remove newlines and tabs, compress multiple spaces
+    text = re.sub(r'[\n\r\t]+', ' ', text)
+    text = re.sub(r'\s{2,}', ' ', text)
+    return text.strip()[:max_length]
+
 
 # ----------------------------------------
 # FastAPI Endpoints
