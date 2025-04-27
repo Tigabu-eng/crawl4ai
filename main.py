@@ -437,7 +437,7 @@ def clean_and_extract_decision(text: str, max_length: int = 5000) -> str:
     return text.strip()[:max_length]
 
 
-def clean_text_preserve_meaning(text: str, max_length: int = 4000) -> str:
+def clean_text_preserve_meaning(text: str, max_length: int = 10000) -> str:
     if not text:
         return ""
 
